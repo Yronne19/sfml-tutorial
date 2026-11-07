@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SFML 3.1.0 – 2D Game Tutorial and Reference</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#eef1e6;--grid:#dde3cf;--ink:#1d2b2a;--mute:#5b6a66;--blue:#2b4bff;--coin:#ffc928;--code:#14201f;--codeink:#e6efe3;--cm:#8fb0a2;--line:#c9d1b8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a19;--grid:#1a2423;--ink:#e6efe3;--mute:#93a59f;--blue:#7d93ff;--code:#0a100f;--line:#2b3836}}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font:17px/1.6 "Bricolage Grotesque",system-ui,sans-serif}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+header{max-width:1100px;margin:0 auto;padding:48px 20px 24px;display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center}
+h1{font-size:clamp(2.4rem,6vw,4.4rem);line-height:1;margin:0 0 16px;font-weight:800;letter-spacing:-.03em}
+header p{max-width:46ch;color:var(--mute);margin:0 0 12px}
+.demo{background:var(--code);border:3px solid var(--ink);padding:10px;box-shadow:8px 8px 0 var(--coin)}
+.demo canvas{width:100%;display:block;background:#1f3330;image-rendering:pixelated}
+.demo small{color:var(--codeink);font:13px "JetBrains Mono",monospace;display:block;margin-top:6px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px 80px;display:grid;grid-template-columns:230px 1fr;gap:32px}
+nav{position:sticky;top:0;align-self:start;max-height:100vh;overflow:auto;padding:16px 0}
+nav input{width:100%;padding:8px 10px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);font:inherit;margin-bottom:12px}
+nav h4{margin:14px 0 4px;font-size:.95rem}
+nav a{display:block;padding:2px 0;text-decoration:none;color:var(--mute);font:14px "JetBrains Mono",monospace}
+nav a:hover{color:var(--blue)}
+main{min-width:0}
+h2{font-size:2rem;margin:48px 0 8px;letter-spacing:-.02em}
+h3{font:600 1.1rem "JetBrains Mono",monospace;margin:0 0 6px}
+.entry{border-left:4px solid var(--blue);padding:4px 0 4px 18px;margin:28px 0;background:color-mix(in srgb,var(--bg) 80%,transparent)}
+.entry p{margin:0 0 10px;max-width:70ch}
+pre{background:var(--code);color:var(--codeink);padding:14px 16px;margin:8px 0;overflow-x:auto;font:13.5px/1.55 "JetBrains Mono",monospace;border-radius:4px}
+.c{color:var(--cm)}
+.tag{font-size:.8rem;color:var(--mute)}
+ol.steps li{margin:10px 0;max-width:70ch}
+code{font-family:"JetBrains Mono",monospace;font-size:.9em;background:var(--line);padding:1px 5px}
+.note{border:2px dashed var(--ink);padding:10px 14px;max-width:70ch;margin:16px 0}
+@media(max-width:800px){header,.wrap{grid-template-columns:1fr}nav{position:static;max-height:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.pj{border:2px solid var(--ink);margin:12px 0;background:color-mix(in srgb,var(--bg) 85%,transparent)}
+.pj summary{cursor:pointer;padding:10px 14px;font-weight:700}
+.pj .in{padding:0 16px 12px}
+.lv{font-size:.8rem;padding:2px 8px;background:var(--coin);color:#1d2b2a;margin-right:8px;font-weight:600}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:14px;margin:16px 0}
+.gal figure{margin:0;text-align:center}
+.gal img{width:96px;height:96px;image-rendering:pixelated;background:#1f3330;border:2px solid var(--ink)}
+.gal figcaption{font:13px "JetBrains Mono",monospace}
+</style>
+</head>
+<body>
+<header>
+ <div>
+  <h1>Make 2D games with SFML 3.1.0</h1>
+  <p>A beginner-friendly C++ tutorial and reference. Every entry has a commented example you can paste into your own project.</p>
+  <p>Try the demo: move the square with the arrow keys or WASD and grab the coin. That is the same loop you will write in C++ below.</p>
+ </div>
+ <div class="demo"><canvas id="demo" width="320" height="200" tabindex="0" aria-label="Demo game: move the square to collect the coin"></canvas><small id="score">coins: 0</small></div>
+</header>
+
+<div class="wrap">
+ <nav aria-label="Reference"><input id="q" type="search" placeholder="Search the reference" aria-label="Search the reference"><div id="nav"></div></nav>
+ <main>
+  <h2 id="start">1. Set up SFML 3.1.0</h2>
+  <p>SFML 3 needs a C++17 compiler. The easiest way to get it is CMake, which downloads and builds SFML for you.</p>
+<pre id="cmake"></pre>
+  <p>Put your images, fonts and sounds next to the executable (or use full paths). SFML 3 loads files through constructors that throw an exception if the file is missing, so a wrong path tells you right away.</p>
+
+  <h2 id="game">2. Your first game, step by step</h2>
+  <ol class="steps">
+   <li><b>Open a window.</b> <code>sf::RenderWindow</code> is where everything is drawn.</li>
+   <li><b>Run the game loop.</b> Each frame: handle events, update objects, clear, draw, display.</li>
+   <li><b>Use delta time.</b> Multiply speed by the seconds since the last frame so the game runs the same on every computer.</li>
+   <li><b>Check collisions.</b> <code>findIntersection</code> on two bounding boxes tells you when they touch.</li>
+  </ol>
+<pre id="mini"></pre>
+
+  <h2 id="ref">3. API reference (SFML 3.1.0)</h2>
+  <p class="note">This page covers the classes you need for 2D games, one example each. SFML 3.1.0 has many more symbols (shaders, joysticks, HTTP, FTP and others); find them on the official site at sfml-dev.org.</p>
+  <div id="docs"></div>
+  <h2 id="projects">4. Ten projects, beginner to advanced</h2>
+  <p>Build them in order. Each one adds a new idea to the last. Open a project to see the goal, the steps and the key code.</p>
+  <div id="pj"></div>
+  <h2 id="assets">5. Free 32x32 game assets</h2>
+  <p>Ten pixel-art sprites, each exactly 32x32 pixels, made for these projects. Right-click an image to save it. The zip with every file, the sprite sheet and a 4-frame player walk cycle is attached to the chat message.</p>
+  <div class="gal" id="gal"></div>
+  <pre id="sheetcode"></pre>
+ </main>
+</div>
+
+<script>
+/* ---- Reference data: [module, name, description, signature, example] ---- */
+const MINI=`#include <SFML/Graphics.hpp>
+
+int main()
+{
+    // 1. Create an 800x600 window (SFML 3 takes a Vector2 for the size)
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "Coin Grabber");
+    window.setFramerateLimit(60);               // don't run faster than 60 FPS
+
+    sf::RectangleShape player({40.f, 40.f});    // the player is a 40x40 box
+    player.setFillColor(sf::Color::Blue);
+
+    sf::CircleShape coin(12.f);                 // the coin is a circle, radius 12
+    coin.setFillColor(sf::Color::Yellow);
+    coin.setPosition({400.f, 300.f});
+
+    sf::Clock clock;                            // measures time between frames
+    const float speed = 300.f;                  // pixels per second
+
+    while (window.isOpen())                     // 2. the game loop
+    {
+        // Events: window close button, key presses, etc.
+        while (const std::optional event = window.pollEvent())
+            if (event->is<sf::Event::Closed>())
+                window.close();
+
+        float dt = clock.restart().asSeconds(); // 3. seconds since last frame
+
+        // Update: move with the keyboard
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))  player.move({-speed * dt, 0.f});
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) player.move({ speed * dt, 0.f});
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))    player.move({0.f, -speed * dt});
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))  player.move({0.f,  speed * dt});
+
+        // 4. Collision: findIntersection returns an optional (empty = no overlap)
+        if (player.getGlobalBounds().findIntersection(coin.getGlobalBounds()))
+            coin.setPosition({float(std::rand() % 760), float(std::rand() % 560)});
+
+        // Draw: clear, draw everything, show the frame
+        window.clear(sf::Color(30, 50, 48));
+        window.draw(coin);
+        window.draw(player);
+        window.display();
+    }
+}`;
+const CMAKE=`cmake_minimum_required(VERSION 3.28)
+project(CoinGrabber LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+
+include(FetchContent)                       # lets CMake download libraries
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 3.1.0                           # the version this page documents
+    GIT_SHALLOW ON)
+FetchContent_MakeAvailable(SFML)
+
+add_executable(game main.cpp)
+target_link_libraries(game PRIVATE SFML::Graphics)   # also: SFML::Audio, SFML::Network`;
+const D=[
+["System","sf::Vector2<T>","A pair of numbers (x, y). Use it for positions, sizes and speeds. Aliases: Vector2f (float), Vector2i (int), Vector2u (unsigned).","sf::Vector2f v(float x, float y);\nfloat length() const;\nVector2<T> normalized() const;","sf::Vector2f pos{100.f, 50.f};\nsf::Vector2f vel{2.f, 0.f};\npos += vel;              // add two vectors\npos = pos * 2.f;         // scale a vector\nfloat len = pos.length();       // distance from (0,0)\nsf::Vector2f dir = pos.normalized(); // same direction, length 1"],
+["System","sf::Clock and sf::Time","Clock measures elapsed time. Time stores a duration and converts it to seconds or milliseconds. Use it to move things at the same speed on every computer.","Time Clock::getElapsedTime() const;\nTime Clock::restart();\nfloat Time::asSeconds() const;\nTime sf::seconds(float); sf::milliseconds(int32_t);","sf::Clock clock;\n// ...inside the game loop:\nfloat dt = clock.restart().asSeconds(); // time of the last frame\nplayer.move({200.f * dt, 0.f});        // 200 pixels per second\n\nsf::Time wait = sf::milliseconds(500);  // half a second\nif (clock.getElapsedTime() > wait) { /* 0.5 s passed */ }"],
+["System","sf::Angle","A rotation that remembers its unit, so you never mix up degrees and radians.","Angle sf::degrees(float);\nAngle sf::radians(float);\nfloat Angle::asDegrees() const;","sf::RectangleShape box({50.f, 50.f});\nbox.setOrigin({25.f, 25.f});     // rotate around the centre\nbox.setRotation(sf::degrees(45.f));\nbox.rotate(sf::degrees(1.f));    // add 1 degree each frame\nfloat now = box.getRotation().asDegrees();"],
+["System","sf::version()","New in 3.1. Returns the SFML version that is running, handy for checking your build.","const sf::Version& sf::version();","const sf::Version& v = sf::version();\nstd::cout << v.string << \"\\n\";   // prints 3.1.0\nif (v.major != SFML_VERSION_MAJOR)  // compile-time vs run-time\n    std::cout << \"Library mismatch!\\n\";"],
+["Window","sf::VideoMode","The size (and pixel depth) of the window.","VideoMode(Vector2u size, unsigned bitsPerPixel = 32);","sf::VideoMode mode({1280, 720}); // 1280x720 window\nsf::RenderWindow w(mode, \"Game\");\n\nauto desktop = sf::VideoMode::getDesktopMode(); // screen size\nstd::cout << desktop.size.x << \"x\" << desktop.size.y;"],
+["Window","sf::Event","What happened since the last frame: key, mouse, resize, close. Read events with pollEvent(), then test the type with is<>() or getIf<>().","std::optional<Event> pollEvent();\nbool is<T>() const;\nconst T* getIf<T>() const;","while (const std::optional event = window.pollEvent())\n{\n    if (event->is<sf::Event::Closed>())       // X button clicked\n        window.close();\n\n    // getIf gives you the event data, or nullptr if it is another type\n    if (const auto* key = event->getIf<sf::Event::KeyPressed>())\n        if (key->code == sf::Keyboard::Key::Escape)\n            window.close();\n\n    if (const auto* resized = event->getIf<sf::Event::Resized>())\n        std::cout << resized->size.x << \"x\" << resized->size.y;\n}"],
+["Window","sf::Keyboard","Check live key state anywhere, without waiting for an event. Good for smooth movement.","static bool isKeyPressed(Keyboard::Key key);","if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))\n    player.move({-5.f, 0.f});   // held down = keeps moving\nif (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))\n    jump();"],
+["Window","sf::Mouse","Read the mouse position and buttons. Convert pixels to world coordinates with mapPixelToCoords.","static Vector2i getPosition(const Window& relativeTo);\nstatic bool isButtonPressed(Mouse::Button);","sf::Vector2i px = sf::Mouse::getPosition(window);      // window pixels\nsf::Vector2f world = window.mapPixelToCoords(px);      // respects the View\nif (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))\n    coin.setPosition(world);   // drag the coin with the mouse"],
+["Graphics","sf::RenderWindow","The window you draw on. Call clear, draw, display once per frame.","RenderWindow(VideoMode mode, const String& title);\nvoid clear(Color = Color::Black);\nvoid draw(const Drawable&);\nvoid display();\nvoid setFramerateLimit(unsigned);","sf::RenderWindow window(sf::VideoMode({800, 600}), \"My Game\");\nwindow.setFramerateLimit(60);     // cap at 60 frames per second\nwindow.setVerticalSyncEnabled(false); // use only one of the two\n\nwhile (window.isOpen())\n{\n    // ...handle events...\n    window.clear(sf::Color::Black); // wipe the last frame\n    window.draw(sprite);            // draw in back-to-front order\n    window.display();               // show what was drawn\n}"],
+["Graphics","sf::Color","An RGBA colour, each channel 0-255. Common colours are constants.","Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);\nstatic const Color Red, Green, Blue, Yellow, White, Black...","sf::Color sky(135, 206, 235);       // red, green, blue\nsf::Color ghost(255, 255, 255, 128); // 50% see-through white\nshape.setFillColor(sf::Color::Red);  // built-in constant\nwindow.clear(sky);"],
+["Graphics","sf::RectangleShape / sf::CircleShape","Ready-made shapes with no image file needed. Perfect for prototypes and hitboxes. All shapes share the same transform functions.","RectangleShape(Vector2f size);\nCircleShape(float radius, size_t pointCount = 30);\nvoid setPosition(Vector2f); void move(Vector2f);\nvoid setOrigin(Vector2f); void setFillColor(Color);","sf::RectangleShape paddle({20.f, 100.f}); // width, height\npaddle.setFillColor(sf::Color::White);\npaddle.setPosition({30.f, 250.f});        // top-left corner\n\nsf::CircleShape ball(10.f);               // radius 10\nball.setOrigin({10.f, 10.f});             // origin to the centre\nball.setOutlineThickness(2.f);\nball.setOutlineColor(sf::Color::Red);\nball.move({4.f, 3.f});                    // offset, not absolute"],
+["Graphics","sf::Texture","An image stored in graphics memory. Load it once and reuse it. It must stay alive as long as sprites use it.","Texture(const std::filesystem::path&);\nbool loadFromFile(const std::filesystem::path&);\nvoid setSmooth(bool);","// The constructor throws std::runtime_error if the file is missing\nconst sf::Texture heroTexture(\"assets/hero.png\");\n\n// Or use loadFromFile and check the result yourself\nsf::Texture grass;\nif (!grass.loadFromFile(\"assets/grass.png\"))\n    return 1;                 // stop with an error code\ngrass.setRepeated(true);      // tile the image when the rect is bigger"],
+["Graphics","sf::Sprite","Draws a Texture on screen. A sprite has no texture of its own: it points to one. In SFML 3 a sprite must be given its texture when you create it.","Sprite(const Texture&);\nvoid setTextureRect(const IntRect&);\nFloatRect getGlobalBounds() const;\nvoid setScale(Vector2f);","sf::Sprite hero(heroTexture);           // texture is required in SFML 3\nhero.setPosition({100.f, 200.f});\nhero.setScale({2.f, 2.f});               // twice as big\n\n// Sprite sheet: show only the first 32x32 frame\nhero.setTextureRect(sf::IntRect({0, 0}, {32, 32}));\n// Next frame: move the rectangle 32 pixels to the right\nhero.setTextureRect(sf::IntRect({32, 0}, {32, 32}));\n\nwindow.draw(hero);"],
+["Graphics","sf::FloatRect","A rectangle (position + size). Use getGlobalBounds() with findIntersection() for collision detection.","std::optional<Rect<T>> findIntersection(const Rect<T>&) const;\nbool contains(Vector2<T>) const;","sf::FloatRect a = player.getGlobalBounds();\nsf::FloatRect b = enemy.getGlobalBounds();\n\n// Returns the overlapping area, or nothing if they don't touch\nif (a.findIntersection(b))\n    health -= 1;\n\nif (a.contains(sf::Vector2f(mouseX, mouseY)))\n    std::cout << \"mouse is over the player\";"],
+["Graphics","sf::Font and sf::Text","Draw text in a TrueType font. Text takes the font in its constructor, followed by the string and the size.","Font(const std::filesystem::path&);\nText(const Font&, String = \"\", unsigned size = 30);","const sf::Font font(\"assets/arial.ttf\");     // keep alive while used\nsf::Text scoreText(font, \"Score: 0\", 24);   // font, string, size\nscoreText.setFillColor(sf::Color::White);\nscoreText.setPosition({10.f, 10.f});\n\nscore += 1;\nscoreText.setString(\"Score: \" + std::to_string(score)); // update it\nwindow.draw(scoreText);"],
+["Graphics","sf::View","A camera. It decides which part of the world appears in the window. Use it for scrolling levels and zoom.","View(const FloatRect&);\nvoid setCenter(Vector2f);\nvoid zoom(float);\nvoid RenderTarget::setView(const View&);","sf::View camera(sf::FloatRect({0.f, 0.f}, {800.f, 600.f}));\n\n// each frame, follow the player\ncamera.setCenter(player.getPosition());\nwindow.setView(camera);       // everything drawn now uses the camera\n// ...draw the world...\n\nwindow.setView(window.getDefaultView()); // back to screen space\n// ...draw the score and menus (they won't scroll)..."],
+["Audio","sf::SoundBuffer and sf::Sound","For short effects (jump, coin). SoundBuffer holds the audio data, Sound plays it. The buffer must outlive the sound. Link SFML::Audio.","SoundBuffer(const std::filesystem::path&);\nSound(const SoundBuffer&);\nvoid play(); void setVolume(float);","#include <SFML/Audio.hpp>\n\nconst sf::SoundBuffer coinBuffer(\"assets/coin.wav\");\nsf::Sound coinSound(coinBuffer);  // sound needs its buffer\ncoinSound.setVolume(60.f);        // 0 to 100\n\n// when the player grabs a coin:\ncoinSound.play();"],
+["Audio","sf::Music","Streams a long audio file from disk, so it uses little memory. Supports WAV, OGG, MP3 and FLAC.","Music(const std::filesystem::path&);\nvoid setLooping(bool);\nvoid play(); void pause(); void stop();","sf::Music music(\"assets/theme.ogg\");  // throws if the file is missing\nmusic.setLooping(true);               // restart when it ends\nmusic.setVolume(40.f);\nmusic.play();                         // plays in the background\n\n// later: music.pause();  music.stop();"],
+["Network","sf::TcpSocket and sf::Packet","Send data between two programs over TCP (multiplayer). Packet bundles values with the right byte order. Link SFML::Network.","Status connect(IpAddress, unsigned short port);\nStatus send(Packet&);\nStatus receive(Packet&);","#include <SFML/Network.hpp>\n\nsf::TcpSocket socket;\nif (socket.connect(sf::IpAddress::LocalHost, 53000) != sf::Socket::Status::Done)\n    return 1;                       // could not connect\n\nsf::Packet packet;\npacket << std::string(\"jump\") << 120.f << 80.f;  // write values in order\nsocket.send(packet);\n\nsf::Packet reply;\nif (socket.receive(reply) == sf::Socket::Status::Done)\n{\n    std::string msg;\n    reply >> msg;                   // read in the same order you wrote\n}"],
+["Network","sf::Dns","New in 3.1. Looks up host names. It returns every address found, wrapped in an optional.","static std::optional<std::vector<IpAddress>> Dns::resolve(std::string_view host);","std::optional<std::vector<sf::IpAddress>> addresses =\n    sf::Dns::resolve(\"www.sfml-dev.org\");\n\nif (addresses && !addresses->empty())   // found at least one?\n{\n    sf::IpAddress address = addresses->front();\n    std::cout << address.toString();\n}"]
+];
+/* ---- Helpers ---- */
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const hl=s=>esc(s).replace(/(\/\/.*)/g,'<span class="c">$1</span>');
+const id=n=>n.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+document.getElementById("mini").innerHTML=hl(MINI);
+document.getElementById("cmake").innerHTML=esc(CMAKE).replace(/(#.*)/g,'<span class="c">$1</span>');
+/* ---- Build reference + nav ---- */
+const docs=document.getElementById("docs"),nav=document.getElementById("nav");
+let mod="";
+D.forEach(([m,name,desc,sig,ex])=>{
+  if(m!==mod){mod=m;docs.insertAdjacentHTML("beforeend",`<h2 data-mod="${m}">${m} module</h2>`);nav.insertAdjacentHTML("beforeend",`<h4>${m}</h4>`);}
+  docs.insertAdjacentHTML("beforeend",`<section class="entry" id="${id(name)}" data-t="${(name+desc).toLowerCase()}"><h3>${esc(name)}</h3><p>${esc(desc)}</p><pre>${esc(sig)}</pre><p class="tag">Example</p><pre>${hl(ex)}</pre></section>`);
+  nav.insertAdjacentHTML("beforeend",`<a href="#${id(name)}" data-t="${(name+desc).toLowerCase()}">${esc(name)}</a>`);
+});
+/* ---- Search ---- */
+document.getElementById("q").addEventListener("input",e=>{
+  const t=e.target.value.toLowerCase();
+  document.querySelectorAll("[data-t]").forEach(el=>el.style.display=el.dataset.t.includes(t)?"":"none");
+});
+/* ---- Hero demo: same loop as the C++ version ---- */
+(()=>{const c=document.getElementById("demo"),g=c.getContext("2d"),out=document.getElementById("score");
+let p={x:40,y:80},coin={x:220,y:100},n=0,k={},last=performance.now();
+addEventListener("keydown",e=>{k[e.key.toLowerCase()]=1;if(document.activeElement===c&&e.key.startsWith("Arrow"))e.preventDefault()});
+addEventListener("keyup",e=>k[e.key.toLowerCase()]=0);
+function frame(now){const dt=(now-last)/1000;last=now;const s=160*dt;     // delta time, like clock.restart()
+ if(k.arrowleft||k.a)p.x-=s; if(k.arrowright||k.d)p.x+=s; if(k.arrowup||k.w)p.y-=s; if(k.arrowdown||k.s)p.y+=s;
+ p.x=Math.max(0,Math.min(280,p.x)); p.y=Math.max(0,Math.min(160,p.y));
+ if(Math.abs(p.x+20-coin.x)<26&&Math.abs(p.y+20-coin.y)<26){n++;out.textContent="coins: "+n;coin={x:20+Math.random()*280,y:20+Math.random()*160}}
+ g.fillStyle="#1f3330";g.fillRect(0,0,320,200);
+ g.fillStyle="#ffc928";g.beginPath();g.arc(coin.x,coin.y,10,0,7);g.fill();
+ g.fillStyle="#7d93ff";g.fillRect(p.x,p.y,40,40);
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame)})();
+
+nav.insertAdjacentHTML("beforeend",'<h4>Guides</h4><a href="#projects">10 projects</a><a href="#assets">32x32 assets</a>');
+const PJ=[
+["Beginner","1. Bouncing Ball","Move a ball and make it bounce off the window edges.","Game loop, Vector2f, delta time",["Open an 800x600 window and make a CircleShape.","Keep a velocity (pixels per second) and move by velocity * dt.","When the ball passes an edge, flip that velocity component."],
+`sf::Vector2f vel{200.f, 150.f};          // pixels per second
+// inside the loop, after you compute dt:
+ball.move(vel * dt);                     // move a little every frame
+auto p = ball.getPosition();
+if (p.x < 0 || p.x > 800 - 2 * r) vel.x = -vel.x;  // left or right wall: reverse x
+if (p.y < 0 || p.y > 600 - 2 * r) vel.y = -vel.y;  // top or bottom wall: reverse y`],
+["Beginner","2. Catch the Coins","Move a basket left and right to catch falling coins and show a score.","vector, spawn timer, collision, Text",["Spawn a coin every 0.8 seconds at a random x above the window.","Move every coin down each frame.","If a coin touches the basket, add 1 to the score and remove it."],
+`std::vector<sf::CircleShape> coins;      // every coin on screen
+for (auto it = coins.begin(); it != coins.end();)
+{
+    it->move({0.f, 150.f * dt});         // fall down
+    if (it->getGlobalBounds().findIntersection(basket.getGlobalBounds()))
+    {
+        ++score;
+        it = coins.erase(it);            // erase returns the next item, so don't ++it here
+    }
+    else ++it;                           // not caught: look at the next coin
+}`],
+["Beginner","3. Pong","Two paddles, one ball, first to 5 wins.","Two-player input, reflection, score reset",["Left player uses W/S, right player uses Up/Down.","Reverse the ball's x speed when it hits a paddle.","When the ball leaves the screen, give the other player a point and reset."],
+`// Ball hits a paddle: send it back a bit faster
+if (ball.getGlobalBounds().findIntersection(paddle.getGlobalBounds()))
+    vel.x = -vel.x * 1.05f;              // reverse direction, speed up 5%
+// Ball leaves the left side: right player scores
+if (ball.getPosition().x < 0) { ++scoreRight; resetBall(); }`],
+["Intermediate","4. Snake","Grow a snake by eating food. Hitting yourself ends the game.","Grid movement, deque, fixed time step",["Store the body as grid cells (Vector2i), not pixels.","Move one cell every 120 ms using a Clock.","Add a new head each step. Remove the tail unless you ate food."],
+`std::deque<sf::Vector2i> body{{5, 5}};   // grid cells
+sf::Vector2i dir{1, 0};                  // moving right
+if (tick.getElapsedTime() > sf::milliseconds(120))
+{
+    tick.restart();
+    body.push_front(body.front() + dir); // new head in front
+    if (body.front() == food) food = randomCell();  // ate: keep the tail, so it grows
+    else body.pop_back();                           // didn't eat: drop the tail
+}
+// draw each cell as a 32x32 square at cell * 32`],
+["Intermediate","5. Flappy Bird clone","Tap Space to flap through gaps in pipes.","Gravity, KeyPressed event, game states",["Add gravity to a vertical speed every frame.","On Space (event, not held), set the speed upward.","Use an enum for Menu, Playing and GameOver."],
+`enum class State { Menu, Playing, GameOver };
+State state = State::Menu;
+float vy = 0.f;                          // vertical speed
+vy += 900.f * dt;                        // gravity pulls down
+bird.move({0.f, vy * dt});
+// in the event loop: a KeyPressed event fires once per press
+if (const auto* key = event->getIf<sf::Event::KeyPressed>())
+    if (key->code == sf::Keyboard::Key::Space) vy = -350.f;  // flap up`],
+["Intermediate","6. Breakout","Break a wall of bricks with a ball and paddle.","Grid of objects, erase on hit, levels",["Fill a vector with 10x5 bricks in two nested loops.","Bounce the ball off bricks and remove the one it hits.","When the vector is empty, load the next level."],
+`for (size_t i = 0; i < bricks.size(); ++i)
+    if (ball.getGlobalBounds().findIntersection(bricks[i].getGlobalBounds()))
+    {
+        vel.y = -vel.y;                  // bounce
+        bricks.erase(bricks.begin() + i);// destroy the brick
+        ++score;
+        break;                           // only one brick per frame
+    }
+if (bricks.empty()) loadNextLevel();`],
+["Advanced","7. Top-Down Shooter","Aim with the mouse, shoot bullets, survive waves of slimes.","Normalized vectors, bullet lists, spawners",["Convert the mouse position to world coordinates.","Fire a bullet along the direction from player to mouse.","Remove bullets that leave the screen and enemies that are hit."],
+`struct Bullet { sf::Vector2f pos, vel; };
+std::vector<Bullet> bullets;
+// direction from the player to the mouse, with length 1
+sf::Vector2f dir = (mouseWorld - player.getPosition()).normalized();
+bullets.push_back({player.getPosition(), dir * 600.f});   // 600 px/s
+for (auto& b : bullets) b.pos += b.vel * dt;
+// remove bullets outside the window (needs <algorithm>)
+bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
+    [](const Bullet& b) { return b.pos.x < 0 || b.pos.x > 800 || b.pos.y < 0 || b.pos.y > 600; }),
+    bullets.end());`],
+["Advanced","8. Platformer","Run, jump and land on platforms. The camera follows you.","Gravity, tile collision, sprite animation, View",["Apply gravity and move on Y first, then on X.","When you overlap a tile while falling, move up out of it and stand.","Animate with player_walk.png and follow with a View."],
+`bool onGround = false;
+vel.y += 1500.f * dt;                    // gravity
+player.move({0.f, vel.y * dt});
+for (const sf::FloatRect& tile : solidTiles)
+    if (auto hit = player.getGlobalBounds().findIntersection(tile))
+    {
+        if (vel.y > 0) { player.move({0.f, -hit->size.y}); onGround = true; } // land on top
+        vel.y = 0.f;
+    }
+if (onGround && jumpPressed) vel.y = -600.f;   // jump only when standing
+camera.setCenter(player.getPosition());        // follow the player
+window.setView(camera);`],
+["Expert","9. Dungeon Crawler","Explore a tile-map dungeon from a text file. Collect keys and gems, avoid spikes.","Tile maps, file loading, inventory, state machine",["Write map.txt with # for walls and . for floor.","Load it into vector<string> and draw one tile per character.","Block movement into walls, pick up items, open doors with keys."],
+`// map.txt: '#' = wall, '.' = floor. Load it with std::ifstream and std::getline.
+std::vector<std::string> map;
+sf::Sprite tile(sheet);                  // sheet = sprites.png
+for (size_t y = 0; y < map.size(); ++y)
+    for (size_t x = 0; x < map[y].size(); ++x)
+    {
+        int frame = (map[y][x] == '#') ? 7 : 6;   // 7 = brick, 6 = grass
+        tile.setTextureRect(sf::IntRect({frame * 32, 0}, {32, 32}));
+        tile.setPosition({x * 32.f, y * 32.f});
+        window.draw(tile);
+    }`],
+["Expert","10. LAN Multiplayer Arena","Two or more players move around the same arena over the network.","TcpListener, SocketSelector, Packet, server authority",["The server receives each player's input and owns the real positions.","The server sends all positions to every client about 20 times a second.","Clients draw the positions and smooth them between packets."],
+`// Server: accept new players without blocking the game
+sf::TcpListener listener;
+listener.listen(53000);                  // open the port
+sf::SocketSelector selector;             // waits on many sockets at once
+selector.add(listener);
+if (selector.wait(sf::milliseconds(10)) && selector.isReady(listener))
+{
+    auto client = std::make_unique<sf::TcpSocket>();
+    if (listener.accept(*client) == sf::Socket::Status::Done)
+    {
+        selector.add(*client);
+        clients.push_back(std::move(client));   // remember this player
+    }
+}
+// Then: read input packets, update positions, send them back to every client.`]
+];
+document.getElementById("pj").innerHTML=PJ.map(([lv,t,g,c,st,code])=>`<details class="pj"><summary><span class="lv">${lv}</span>${esc(t)}</summary><div class="in"><p><b>Goal:</b> ${esc(g)}<br><b>You will learn:</b> ${esc(c)}</p><ol class="steps">${st.map(s=>"<li>"+esc(s)+"</li>").join("")}</ol><pre>${hl(code)}</pre></div></details>`).join("");
+const SHEET="data:image/png;base64,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";
+const AN=["player","slime","coin","heart","gem","key","grass","brick","water","spike"];
+document.getElementById("sheetcode").innerHTML=hl(`// Load the sheet once, then pick a 32x32 frame by its number (0 = player ... 9 = spike)
+sf::Texture sheet("assets/sprites.png");
+sf::Sprite coin(sheet);
+coin.setTextureRect(sf::IntRect({2 * 32, 0}, {32, 32}));   // frame 2 = coin
+sheet.setSmooth(false);   // keep pixel art sharp (this is already the default)`);
+const im=new Image();im.onload=()=>{const g=document.getElementById("gal");
+ AN.forEach((n,i)=>{const c=document.createElement("canvas");c.width=c.height=32;c.getContext("2d").drawImage(im,i*32,0,32,32,0,0,32,32);
+  const f=document.createElement("figure");f.innerHTML=`<img alt="${n} sprite, 32 by 32 pixels" src="${c.toDataURL()}"><figcaption>${i}: ${n}</figcaption>`;g.appendChild(f)})};
+im.src=SHEET;
+</script>
+</body>
+</html>
